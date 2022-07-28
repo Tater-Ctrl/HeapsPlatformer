@@ -1,0 +1,7 @@
+-cp src
+-lib heaps
+-lib hldx
+-lib ldtk-haxe-api
+-hl build/Game.hl
+-main Game
+-debug
