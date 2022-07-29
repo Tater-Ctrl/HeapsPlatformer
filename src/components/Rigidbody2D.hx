@@ -4,7 +4,7 @@ import types.Vector2;
 
 class Rigidbody2D extends Component {
   public var gravityEnabled: Bool = true;
-  public var gravity: Float = 8;
+  public var gravity: Float = 9.81;
   public var isGrounded: Bool = false;
   public var collider: Collider;
 
@@ -18,10 +18,10 @@ class Rigidbody2D extends Component {
     moveDirection = direction;
   }
 
-  private function moveBody() {
+  private function moveRigidBody() {
     entity.x += actualVelocity.x;
     entity.y += actualVelocity.y;
-
+    
     actualVelocity.x = 0;
     actualVelocity.y = 0;
   }
@@ -37,16 +37,17 @@ class Rigidbody2D extends Component {
     if (gravityEnabled)
       applyGravity(dt);
 
-    actualVelocity += moveDirection + velocity;
+    actualVelocity += velocity + moveDirection;
 
     checkCollision();
-    moveBody();
+    moveRigidBody();
   }
 
   private function checkCollision() {
     isGrounded = false;
     if (collider != null) {
-      var bodies = Game.inst.quadTreeColliders.retrieve(collider.getRect());
+      var bodies = Game.getStaticColliders(collider.getRect());
+
       for (i in 0...bodies.length) {
         if (Collider.checkSphereCollision(collider.getRect(), bodies[i].getRect())) {
           var r1 = collider.getRect();

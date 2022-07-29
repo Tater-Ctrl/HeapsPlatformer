@@ -14,7 +14,6 @@ class Platform extends Entity {
   public function createCollider(rect: Rect):Void {
     if (collider != null) {
       collider.setRect(rect); 
-
     }
   }
 }

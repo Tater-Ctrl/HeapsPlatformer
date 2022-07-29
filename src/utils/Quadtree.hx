@@ -87,8 +87,8 @@ class Quadtree {
 
   private function getIndex(rect: Rect): Int {
     var index: Int = -1;
-    var vMid: Float = bounds.x + bounds.w / 2;
-    var hMid: Float = bounds.y + bounds.h / 2;
+    var vMid: Float = bounds.x + (bounds.w / 2);
+    var hMid: Float = bounds.y + (bounds.h / 2);
 
     var topQuadrant: Bool = (rect.y < hMid && rect.y + rect.h < hMid);
     var botQuadrant: Bool = (rect.y > hMid);

@@ -18,17 +18,18 @@ class Collider extends Component {
   public var margin: Vector2 = new Vector2(10, 5);
   public var collisionMode: CollisionMode = CollisionMode.STATIC;
   
-  public var topLeft(get, null):Vector2;
-  public var topRight(get, null):Vector2;
-  public var bottomLeft(get, null):Vector2;
-  public var bottomRight(get, null):Vector2;
+  public var yMin(get, null):Float;
+  public var xMax(get, null):Float;
+  public var xMin(get, null):Float;
+  public var yMax(get, null):Float;
 
-  private var _rect: Rect;
+  public var debugger: h2d.Graphics;
   
   public function activeCol() {
+    debugger = new h2d.Graphics(Game.getScene());
+
     if (collisionMode == CollisionMode.STATIC) {
-      Game.addStaticCollisionBody(this);
-      Game.addCollisionBody(this);
+      Game.addStaticCollider(this);
     }
   }
 
@@ -69,30 +70,36 @@ class Collider extends Component {
   }
 
   public function debugRect() {
-    var customGraphics = new h2d.Graphics(Game.getScene());
-    customGraphics.beginFill(0xEA8220);
+    debugger.beginFill(0xEA8220);
     
     var r = getRect();
-    customGraphics.drawRect(
+    debugger.drawRect(
       r.x, r.y, r.w, r.h
     );
 
-    customGraphics.endFill();
+    debugger.endFill();
   }
 
-	function get_bottomLeft():Vector2 {
-		return entity.position + rect.position + new Vector2(0, rect.h);
+  public function clearDebugRect() {
+    debugger.clear();
+  }
+
+
+
+	function get_yMin():Float {
+		return entity.y + rect.y;
 	}
 
-  function get_bottomRight():Vector2 {
-		return entity.position + rect.position + rect.size;
+  function get_xMin():Float {
+    return entity.x + rect.x;
+  }
+
+	function get_xMax():Float {
+		return entity.x + (rect.x + rect.w);
 	}
 
-	function get_topLeft():Vector2 {
-		return entity.position + rect.position;
-	}
 
-	function get_topRight():Vector2 {
-		return entity.position + rect.position + new Vector2(rect.w, 0);
+	function get_yMax():Float {
+		return entity.y + (rect.y + rect.h);
 	}
 }

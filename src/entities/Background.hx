@@ -10,7 +10,6 @@ class Background extends Entity {
 
   public function new() {
     super();
-
     // var tile = Res.img.Mountain2.toTile();
     // sprite = addComponent(SpriteComponent);
     // sprite.setSprite(tile);

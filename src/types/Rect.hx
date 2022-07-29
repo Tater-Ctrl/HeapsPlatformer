@@ -1,5 +1,7 @@
 package types;
 
+import components.Component;
+
 class Rect {
   public var x:Float;
   public var y:Float;

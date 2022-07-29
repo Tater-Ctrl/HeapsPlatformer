@@ -5,12 +5,14 @@ import haxe.Constraints;
 import components.Component;
 import h2d.Object;
 
-class Entity extends Object implements IUpdate {
+class Entity {
+  public var x:Float;
+  public var y:Float;
+
   private var components: Array<Component> = [for (i in 0...32) null];
   public var position(get, null): Vector2;
-  public function new() {
-    super();
-  }
+
+  public function new() {}
 
   @:generic
   public function getComponent<T: Component>(type: Class<T>): T {
@@ -57,19 +59,24 @@ class Entity extends Object implements IUpdate {
     };
   }
 
-  public function componentLateUpdate(dt:Float) {
+  public function componentDraw(dt:Float) {
     for (i in 0...components.length) {
       if (components[i] != null) {
-        components[i].fixedUpdate(dt);
+        components[i].draw(dt);
       }
     }
+  }
+
+  public function setPosition(x: Float, y: Float) {
+    this.x = x;
+    this.y = y;
   }
 
 	public function start() {}
 
 	public function update(dt:Float) {}
 
-	public function lateUpdate(dt:Float) {}
+	public function draw(dt:Float) {}
 
 	public function fixedUpdate(dt:Float) {}
 

@@ -1,4 +1,7 @@
 package entities;
+import h2d.col.Bounds;
+import components.Camera;
+import types.Vector2;
 import types.Rect;
 import components.Collider;
 import components.HealthComponent;
@@ -14,7 +17,7 @@ class Player extends Entity {
   private var health: HealthComponent;
   private var collider: Collider;
 
-  private var speed: Float = 150.;
+  private var speed: Float = 300.;
 
   public function new() {
     super();
@@ -24,15 +27,17 @@ class Player extends Entity {
     body      = addComponent(Rigidbody2D);
     sprite    = addComponent(SpriteComponent);
     collider  = addComponent(Collider);
-
+    addComponent(Camera);
+    
     body.gravityEnabled = true;
+    
     body.collider = collider;
-
     collider.setRect(new Rect(20, 10, 25, 25));
     collider.collisionMode = CollisionMode.DYNAMIC;
-
+    
     var tile = Res.img.SmolBunHop2.toTile();
     sprite.setSprite(tile.sub(0, 0, tile.width / 3, tile.height));
+
     input.Jump = jump;
   }
 
@@ -42,7 +47,7 @@ class Player extends Entity {
 
   public function jump() {
     if (body.isGrounded) {
-      body.jump(10);
+      body.jump(7);
     }
   }
 }

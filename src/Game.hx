@@ -1,3 +1,5 @@
+import utils.SpatialHash;
+import h2d.Camera;
 import h2d.Object;
 import hxd.Window;
 import utils.Quadtree;
@@ -20,28 +22,20 @@ typedef EntityDef = {
 
 class Game extends hxd.App {
 	private var entities:Array<Entity> = new Array<Entity>();
-  private static var collisionBodies:Array<Collider> = new Array<Collider>();
-  public var quadTreeColliders: Quadtree;
+  // Gets used for static collision calculation
+  private var spatialColliders: SpatialHash<Collider>;
 
 	var fixedTimeStep:Float = 1. / 60.;
 	var fixedTime:Float = 0.;
 
 	public static var inst:Game;
 
-  public static function addCollisionBody(body: Collider): Int {
-    return collisionBodies.push(body);
+  public static function addStaticCollider(body: Collider) {
+    Game.inst.spatialColliders.insert(body, body.getRect());
   }
 
-  public static function getCollisionBodies(): Array<Collider> {
-    return collisionBodies;
-  }
-
-  public function insertBody(body: Collider) {
-    quadTreeColliders.insert(body);
-  }
-
-  public static function addStaticCollisionBody(body: Collider) {
-    Game.inst.quadTreeColliders.insert(body);
+  public static function getStaticColliders(rect: Rect): Array<Collider> {
+    return Game.inst.spatialColliders.retrieve(rect);
   }
 
 	@:generic
@@ -51,10 +45,10 @@ class Game extends hxd.App {
 		if (Std.isOfType(entity, Entity)) {
 			var result = cast entity;
 			Game.inst.entities.push(result);
-			Game.inst.s2d.addChild(result);
+			//Game.inst.s2d.addChild(result);
 
-      if (parent != null)
-        parent.addChild(result);
+      // if (parent != null)
+      //   parent.addChild(result);
 
 			return entity;
 		}
@@ -67,10 +61,9 @@ class Game extends hxd.App {
   }
 
 	override function init() {
-    Window.getInstance().resize(1280, 720);
 		inst = this;
 
-    quadTreeColliders = new Quadtree(0, new Rect(0, 0, s2d.width, s2d.height));
+    spatialColliders = new SpatialHash();
 
     var map = new TestMap();
     var level = map.all_levels.Level_0;
@@ -81,7 +74,6 @@ class Game extends hxd.App {
     }
 
     s2d.addChild(level.l_Tiles.render());
-
     var tiles = level.json.layerInstances[0].gridTiles;
 
     for(i in 0...tiles.length) {
@@ -89,11 +81,13 @@ class Game extends hxd.App {
 
       if (tile != null) {
         var entity = createEntity(Platform);
-        entity.createCollider(new Rect(tile.px[0], tile.px[1], 35, 35));
+        entity.setPosition(tile.px[0], tile.px[1]);
+        entity.createCollider(new Rect(0, 0, 35, 35));
       }
     }
     
-		createEntity(Player).setPosition(50, 50);
+		var player = createEntity(Player);
+    player.setPosition(50, 50);
 
     for (i in 0...entities.length) {
       var col = entities[i].getComponent(Collider);
@@ -123,9 +117,9 @@ class Game extends hxd.App {
 		}
 
 		for (i in 0...length)
-			entities[i].componentLateUpdate(dt);
+			entities[i].componentDraw(dt);
 		for (i in 0...length)
-			entities[i].lateUpdate(dt);
+			entities[i].draw(dt);
 	}
 
 	static function main() {
