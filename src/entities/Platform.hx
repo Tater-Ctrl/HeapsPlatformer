@@ -1,14 +1,14 @@
 package entities;
 
 import types.Rect;
-import components.CollisionBody;
+import components.Collider;
 
 class Platform extends Entity {
-  private var collider: CollisionBody;
+  private var collider: Collider;
   public function new() {
     super();
 
-    collider = addComponent(CollisionBody);
+    collider = addComponent(Collider);
   }
 
   public function createCollider(rect: Rect):Void {

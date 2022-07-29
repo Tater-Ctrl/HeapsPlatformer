@@ -1,6 +1,6 @@
 package utils;
 
-import components.CollisionBody;
+import components.Collider;
 import types.Rect;
 
 class Quadtree {
@@ -8,14 +8,14 @@ class Quadtree {
   private var MAX_LEVELS: Int = 5;
 
   private var level: Int;
-  private var objects: Array<CollisionBody>;
+  private var objects: Array<Collider>;
   private var bounds: Rect;
   private var nodes: Array<Quadtree>;
 
   public function new(level: Int, bounds: Rect) {
     this.level = level;
     this.bounds = bounds;
-    this.objects = new Array<CollisionBody>();
+    this.objects = new Array<Collider>();
     this.nodes = [null, null, null, null];
   }
 
@@ -32,8 +32,8 @@ class Quadtree {
   }
 
   private function split() {
-    var w = bounds.width / 2;
-    var h = bounds.height / 2;
+    var w = bounds.w / 2;
+    var h = bounds.h / 2;
     var x = bounds.x;
     var y = bounds.y;
 
@@ -43,7 +43,7 @@ class Quadtree {
     nodes[3] = new Quadtree(level+1, new Rect(x + w, y + h, w, h));
   }
 
-  public function insert(body: CollisionBody) {
+  public function insert(body: Collider) {
     if (nodes[0] != null) {
       var index = getIndex(body.getRect());
 
@@ -74,9 +74,9 @@ class Quadtree {
     }
   }
 
-  public function retrieve(rect: Rect): Array<CollisionBody> {
+  public function retrieve(rect: Rect): Array<Collider> {
     var index: Int = getIndex(rect);
-    var bodies = new Array<CollisionBody>();
+    var bodies = new Array<Collider>();
 
     if (index != -1 && nodes[0] != null) {
       bodies = bodies.concat(nodes[index].retrieve(rect));
@@ -87,13 +87,13 @@ class Quadtree {
 
   private function getIndex(rect: Rect): Int {
     var index: Int = -1;
-    var vMid: Float = bounds.x + bounds.width / 2;
-    var hMid: Float = bounds.y + bounds.height / 2;
+    var vMid: Float = bounds.x + bounds.w / 2;
+    var hMid: Float = bounds.y + bounds.h / 2;
 
-    var topQuadrant: Bool = (rect.y < hMid && rect.y + rect.height < hMid);
+    var topQuadrant: Bool = (rect.y < hMid && rect.y + rect.h < hMid);
     var botQuadrant: Bool = (rect.y > hMid);
 
-    if (rect.x < vMid && rect.x + rect.width < vMid) {
+    if (rect.x < vMid && rect.x + rect.w < vMid) {
       if (topQuadrant) {
         index = 1;
       } else if (botQuadrant) {

@@ -1,20 +1,30 @@
 package types;
 
-import haxe.display.Display.Package;
-
 class Rect {
   public var x:Float;
   public var y:Float;
-  public var width:Float;
-  public var height:Float;
+  public var w:Float;
+  public var h:Float;
   public var position(get, null):Vector2;
   public var size(get, null):Vector2;
+
+  // Used for calculating collisions
+  public var cx:Float;
+  public var cy:Float;
+  /**
+    Radius used in collision calculations
+  **/
+  public var r:Float;
 
   public function new(x = 0., y = 0., width = 0., height = 0.) {
     this.x = x;
     this.y = y;
-    this.width = width;
-    this.height = height;
+    this.w = width;
+    this.h = height;
+
+    cx = x + w / 2;
+    cy = y + h / 2;
+    r = Math.sqrt(h * h + w * w) / 2;
   }
 
   /**
@@ -22,8 +32,8 @@ class Rect {
   **/
   public function length(): Float {
     return Math.max(
-      Math.abs(x) + Math.abs(width),
-      Math.abs(y) + Math.abs(height)
+      Math.abs(x) + Math.abs(w),
+      Math.abs(y) + Math.abs(h)
     );
   }
 
@@ -32,6 +42,6 @@ class Rect {
 	}
 
 	function get_size():Vector2 {
-		return new Vector2(width, height);
+		return new Vector2(w, h);
 	}
 }

@@ -6,7 +6,7 @@ import entities.Background;
 import types.Rect;
 import entities.Platform;
 import h2d.Scene;
-import components.CollisionBody;
+import components.Collider;
 import entities.Player;
 import utils.Debug;
 import entities.Entity;
@@ -20,7 +20,7 @@ typedef EntityDef = {
 
 class Game extends hxd.App {
 	private var entities:Array<Entity> = new Array<Entity>();
-  private static var collisionBodies:Array<CollisionBody> = new Array<CollisionBody>();
+  private static var collisionBodies:Array<Collider> = new Array<Collider>();
   public var quadTreeColliders: Quadtree;
 
 	var fixedTimeStep:Float = 1. / 60.;
@@ -28,19 +28,19 @@ class Game extends hxd.App {
 
 	public static var inst:Game;
 
-  public static function addCollisionBody(body: CollisionBody): Int {
+  public static function addCollisionBody(body: Collider): Int {
     return collisionBodies.push(body);
   }
 
-  public static function getCollisionBodies(): Array<CollisionBody> {
+  public static function getCollisionBodies(): Array<Collider> {
     return collisionBodies;
   }
 
-  public function insertBody(body: CollisionBody) {
+  public function insertBody(body: Collider) {
     quadTreeColliders.insert(body);
   }
 
-  public static function addStaticCollisionBody(body: CollisionBody) {
+  public static function addStaticCollisionBody(body: Collider) {
     Game.inst.quadTreeColliders.insert(body);
   }
 
@@ -96,7 +96,7 @@ class Game extends hxd.App {
 		createEntity(Player).setPosition(50, 50);
 
     for (i in 0...entities.length) {
-      var col = entities[i].getComponent(CollisionBody);
+      var col = entities[i].getComponent(Collider);
 
       if (col != null) {
         col.activeCol();

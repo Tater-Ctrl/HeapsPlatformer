@@ -1,6 +1,6 @@
 package entities;
 import types.Rect;
-import components.CollisionBody;
+import components.Collider;
 import components.HealthComponent;
 import hxd.Res;
 import components.SpriteComponent;
@@ -12,7 +12,7 @@ class Player extends Entity {
   private var body: Rigidbody2D;
   private var sprite: SpriteComponent;
   private var health: HealthComponent;
-  private var collider: CollisionBody;
+  private var collider: Collider;
 
   private var speed: Float = 150.;
 
@@ -23,7 +23,7 @@ class Player extends Entity {
     input     = addComponent(InputComponent);
     body      = addComponent(Rigidbody2D);
     sprite    = addComponent(SpriteComponent);
-    collider  = addComponent(CollisionBody);
+    collider  = addComponent(Collider);
 
     body.gravityEnabled = true;
     body.collider = collider;
