@@ -1,7 +1,5 @@
 package types;
 
-import components.Component;
-
 class Rect {
   public var x:Float;
   public var y:Float;
@@ -36,6 +34,15 @@ class Rect {
     return Math.max(
       Math.abs(x) + Math.abs(w),
       Math.abs(y) + Math.abs(h)
+    );
+  }
+
+  public function addMargin(v: Float): Rect {
+    return new Rect(
+      x - v,
+      y - v,
+      w + v * 2,
+      h + v * 2
     );
   }
 

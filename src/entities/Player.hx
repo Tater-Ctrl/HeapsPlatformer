@@ -1,7 +1,8 @@
 package entities;
-import h2d.col.Bounds;
-import components.Camera;
+import h2d.Graphics;
 import types.Vector2;
+import utils.Time;
+import components.Camera;
 import types.Rect;
 import components.Collider;
 import components.HealthComponent;
@@ -16,6 +17,7 @@ class Player extends Entity {
   private var sprite: SpriteComponent;
   private var health: HealthComponent;
   private var collider: Collider;
+  private var camera: Camera;
 
   private var speed: Float = 300.;
 
@@ -27,7 +29,7 @@ class Player extends Entity {
     body      = addComponent(Rigidbody2D);
     sprite    = addComponent(SpriteComponent);
     collider  = addComponent(Collider);
-    addComponent(Camera);
+    camera    = addComponent(Camera);
     
     body.gravityEnabled = true;
     
@@ -41,13 +43,15 @@ class Player extends Entity {
     input.Jump = jump;
   }
 
-  public override function fixedUpdate(dt:Float) {
-    body.movePosition(input.moveDirection * speed * dt);
+  override function fixedUpdate() {
+    super.fixedUpdate();
+
+    body.movePosition(input.moveDirection * speed * Time.fixedDeltaTime);
   }
 
   public function jump() {
     if (body.isGrounded) {
-      body.jump(7);
+      body.jump(20);
     }
   }
 }

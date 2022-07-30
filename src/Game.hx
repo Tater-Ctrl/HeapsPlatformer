@@ -1,10 +1,11 @@
+import utils.Time;
+import h2d.Layers;
 import utils.SpatialHash;
 import h2d.Camera;
 import h2d.Object;
 import hxd.Window;
 import utils.Quadtree;
 import types.Vector2;
-import entities.Background;
 import types.Rect;
 import entities.Platform;
 import h2d.Scene;
@@ -24,9 +25,10 @@ class Game extends hxd.App {
 	private var entities:Array<Entity> = new Array<Entity>();
   // Gets used for static collision calculation
   private var spatialColliders: SpatialHash<Collider>;
+  private var debugGraphics: h2d.Graphics;
+  private var layer: Layers;
 
-	var fixedTimeStep:Float = 1. / 60.;
-	var fixedTime:Float = 0.;
+	var fixedTimeAccumulator:Float = 0.;
 
 	public static var inst:Game;
 
@@ -45,10 +47,6 @@ class Game extends hxd.App {
 		if (Std.isOfType(entity, Entity)) {
 			var result = cast entity;
 			Game.inst.entities.push(result);
-			//Game.inst.s2d.addChild(result);
-
-      // if (parent != null)
-      //   parent.addChild(result);
 
 			return entity;
 		}
@@ -64,16 +62,19 @@ class Game extends hxd.App {
 		inst = this;
 
     spatialColliders = new SpatialHash();
+    layer = new Layers(s2d);
+    debugGraphics = new h2d.Graphics();
+    layer.add(debugGraphics, 1000);
 
     var map = new TestMap();
     var level = map.all_levels.Level_0;
 
     if (level != null && level.hasBgImage()) {
       var background = level.getBgBitmap();
-      s2d.addChild(background);
+      layer.add(background, 0);
     }
 
-    s2d.addChild(level.l_Tiles.render());
+    layer.add(level.l_Tiles.render(), 0);
     var tiles = level.json.layerInstances[0].gridTiles;
 
     for(i in 0...tiles.length) {
@@ -87,7 +88,7 @@ class Game extends hxd.App {
     }
     
 		var player = createEntity(Player);
-    player.setPosition(50, 50);
+    player.setPosition(55, 55);
 
     for (i in 0...entities.length) {
       var col = entities[i].getComponent(Collider);
@@ -96,30 +97,36 @@ class Game extends hxd.App {
         col.activeCol();
       }
     }
+
+    for (i in 0...entities.length)
+      entities[i].awake();
 	}
 
 	override function update(dt:Float) {
-		fixedTime += Timer.elapsedTime;
 		var length:Int = entities.length;
+    
+    Time.fixedDeltaTime += dt;
+    Time.fMod = Timer.tmod - (30 / 60);
+
 
 		for (i in 0...length)
-			entities[i].componentUpdate(dt);
-		for (i in 0...length)
-			entities[i].update(dt);
+			entities[i].update();
 
-		while (fixedTime > fixedTimeStep) {
+		while (Time.fixedDeltaTime >= Const.FIXED_TIME_STEP) {
 			for (i in 0...length)
-				entities[i].componentFixedUpdate(dt);
-			for (i in 0...length)
-				entities[i].fixedUpdate(dt);
+				entities[i].fixedUpdate();
 
-			fixedTime -= fixedTimeStep;
+			Time.fixedDeltaTime -= Const.FIXED_TIME_STEP;
 		}
 
 		for (i in 0...length)
-			entities[i].componentDraw(dt);
-		for (i in 0...length)
-			entities[i].draw(dt);
+			entities[i].draw();
+
+    #if debug
+    debugGraphics.clear();
+    for (i in 0...length)
+      entities[i].drawGizmos(debugGraphics);
+    #end
 	}
 
 	static function main() {

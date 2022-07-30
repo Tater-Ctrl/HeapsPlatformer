@@ -7,7 +7,7 @@ class InputComponent extends Component {
   public var moveDirection: Vector2 = new Vector2();
   public var Jump:Void->Void;
 
-  override function update(dt: Float) {
+  override function update() {
     updateMoveDirection();
 
     if (Key.isPressed(Key.SPACE) && Jump != null) {

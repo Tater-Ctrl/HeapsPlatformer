@@ -1,5 +1,6 @@
 package components;
 
+import h2d.Graphics;
 import types.Rect;
 import types.Vector2;
 
@@ -23,11 +24,19 @@ class Collider extends Component {
   public var xMin(get, null):Float;
   public var yMax(get, null):Float;
 
-  public var debugger: h2d.Graphics;
+  public var debug: Bool = false;
+
+  override function drawGizmos(graphics:Graphics) {
+    if (debug) {
+      graphics.beginFill(0xFFFFFF);
+      var r = getRect();
+      graphics.drawRect(r.x, r.y, r.w, r.h);
+      debug = false;
+    }
+
+  }
   
   public function activeCol() {
-    debugger = new h2d.Graphics(Game.getScene());
-
     if (collisionMode == CollisionMode.STATIC) {
       Game.addStaticCollider(this);
     }
@@ -68,23 +77,6 @@ class Collider extends Component {
       && point.y >= rect.y 
       && point.y <= rect.y + rect.h;
   }
-
-  public function debugRect() {
-    debugger.beginFill(0xEA8220);
-    
-    var r = getRect();
-    debugger.drawRect(
-      r.x, r.y, r.w, r.h
-    );
-
-    debugger.endFill();
-  }
-
-  public function clearDebugRect() {
-    debugger.clear();
-  }
-
-
 
 	function get_yMin():Float {
 		return entity.y + rect.y;

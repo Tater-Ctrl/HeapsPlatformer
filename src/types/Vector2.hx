@@ -4,6 +4,11 @@ abstract Vector2(Array<Float>) {
   public var x(get, set): Float;
   public var y(get, set): Float;
 
+  function set_x(value:Float):Float return this[0] = value;
+  function set_y(value:Float):Float return this[1] = value;
+  function get_x():Float return this[0];
+  function get_y():Float return this[1];
+
   public function new(x = 0., y = 0.) {
     this = [x, y];
 
@@ -64,21 +69,5 @@ abstract Vector2(Array<Float>) {
   @:op(A / b)
   public static function divideVector(v1: Vector2, v2: Vector2) {
     return new Vector2(v1.x / v2.x, v1.y / v2.y);
-  }
-
-  function get_x(): Float {
-    return this[0];
-  }
-
-  function set_x(val: Float): Float {
-    return this[0] = val;
-  }
-
-  function get_y(): Float {
-    return this[1];
-  }
-
-  function set_y(val: Float): Float {
-    return this[1] = val;
   }
 }

@@ -8,7 +8,7 @@ import h2d.Bitmap;
 import types.Sprite;
 
 class SpriteComponent extends Component {
-  var sprite : Sprite;
+  public var sprite : Sprite;
 
   public function setSprite(tile: Tile) {
     sprite = new Sprite(tile);
@@ -19,8 +19,8 @@ class SpriteComponent extends Component {
     sprite.height = size.y;
   }
 
-  override function draw(dt:Float) {
-    super.draw(dt);
+  override function draw() {
+    super.draw();
     sprite.setPos(entity.x, entity.y);
   }
 }

@@ -1,22 +1,36 @@
 package components;
 
+import utils.Utils;
 import types.Vector2;
 
 class Camera extends Component {
 
-  override function draw(dt:Float) {
+  public var camera(get, null): h2d.Camera;
+  public inline function get_camera() return Game.getScene().camera;
+
+  override function draw() {
     var scene = Game.getScene();
     var current = new Vector2(scene.camera.x, scene.camera.y);
     var target = new Vector2(entity.x - scene.width * 0.5, entity.y - scene.height * 0.5);
-    var value = vInterp(current, target, 0.05);
+    var value = Utils.vInterp(current, target, 0.05);
 
-    scene.camera.setPosition(value.x, value.y);
+    value.x = clamp(value.x, target.x - 85, target.x + 85);
+
+    // var dist = 
+
+    // scene.camera.setPosition(Math.round(value.x), Math.round(value.y));
+    scene.camera.setPosition(target.x, target.y);
   }
-  
-  function vInterp(cur: Vector2, tar: Vector2, rate: Float): Vector2 {
-    return new Vector2(
-      (cur.x * (1.0-rate)) + (tar.x * rate),
-      (cur.y * (1.0-rate)) + (tar.y * rate)
-    );
+
+  function clamp(value: Float, min: Float, max: Float) {
+    if (value > max)
+      return max;
+    if (value < min)
+      return min;
+    return value;
+  }
+
+  function interp() {
+
   }
 }

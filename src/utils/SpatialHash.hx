@@ -1,5 +1,6 @@
 package utils;
 
+import dn.struct.FixedArray;
 import haxe.ds.Map;
 import types.Rect;
 
@@ -10,7 +11,17 @@ class SpatialHash<T> {
   public function new() {}
 
   public function insert(object: T, rect: Rect) {
-    var keys = hashRect(rect);
+    var keys = hashRect2(rect);
+    // var addedKeys: Array<String> = [];
+
+    // for(k in keys) {
+    //   if (!addedKeys.contains(k)) {
+    //     if (grid.exists(k))
+    //       grid[k].push(object);
+    //     else 
+    //       grid[k] = [object];
+    //   }
+    // }
 
     if (grid.exists(keys[0]))
       grid[keys[0]].push(object);
@@ -37,25 +48,22 @@ class SpatialHash<T> {
   }
 
   public function retrieve(rect: Rect): Array<T> {
-    var keys = hashRect(rect);
+    var keys = search(rect);
+    var addedKeys: Array<String> = [];
     var objects: Array<T> = [];
 
-    if (grid.exists(keys[0]))
-      objects = grid[keys[0]];
-
-    if (keys[1] != keys[0] && grid.exists(keys[1]))
-      objects = objects.concat(grid[keys[1]]);
-
-    if ((keys[2] != keys[0] || keys[2] != keys[1]) && grid.exists(keys[2]))
-      objects = objects.concat(grid[keys[2]]);
-
-    if ((keys[3] != keys[0] || keys[3] != keys[1] || keys[3] != keys[2]) && grid.exists(keys[3]))
-      objects = objects.concat(grid[keys[3]]);
+    for (k in keys) {
+      if (grid.exists(k) && !addedKeys.contains(k)) {
+        objects = objects.concat(grid[k]);
+        addedKeys.push(k);
+      }
+    }
 
     return objects;
   }
 
-  private function hashRect(rect: Rect): Array<String> {
+  
+  private function hashRect2(rect: Rect): Array<String> {
     var x = Math.floor(rect.x / GRID_SIZE);
     var y = Math.floor(rect.y / GRID_SIZE);
     var w = Math.floor((rect.x + rect.w) / GRID_SIZE);
@@ -67,6 +75,23 @@ class SpatialHash<T> {
       hashKey(x, h),
       hashKey(w, h)
     ];
+
+    return keys;
+  }
+
+  private function search(rect: Rect): Array<String> {
+    var x = Math.round(rect.x / GRID_SIZE);
+    var y = Math.round(rect.y / GRID_SIZE);
+    var w = Math.round((rect.x + rect.w) / GRID_SIZE);
+    var h = Math.round((rect.y + rect.h) / GRID_SIZE);
+
+    var keys = [];
+
+    for (i in x-1...w+1) {
+      for (j in y-1...h+1) {
+        keys.push(hashKey(i, j));
+      }
+    }
 
     return keys;
   }
