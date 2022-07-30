@@ -1,3 +1,4 @@
+import h2d.RenderContext;
 import utils.Time;
 import h2d.Layers;
 import utils.SpatialHash;
@@ -23,6 +24,8 @@ typedef EntityDef = {
 
 class Game extends hxd.App {
 	private var entities:Array<Entity> = new Array<Entity>();
+  // For debugging code
+  public static var allColliders: Array<Collider>;
   // Gets used for static collision calculation
   private var spatialColliders: SpatialHash<Collider>;
   private var debugGraphics: h2d.Graphics;
@@ -59,12 +62,16 @@ class Game extends hxd.App {
   }
 
 	override function init() {
+    Window.getInstance().resize(1280, 720);
 		inst = this;
 
+    allColliders = new Array();
     spatialColliders = new SpatialHash();
     layer = new Layers(s2d);
     debugGraphics = new h2d.Graphics();
     layer.add(debugGraphics, 1000);
+
+    s2d.scaleMode = LetterBox(Const.RENDER_WIDTH, Const.RENDER_HEIGHT, false);
 
     var map = new TestMap();
     var level = map.all_levels.Level_0;
@@ -106,8 +113,7 @@ class Game extends hxd.App {
 		var length:Int = entities.length;
     
     Time.fixedDeltaTime += dt;
-    Time.fMod = Timer.tmod - (30 / 60);
-
+    Time.fMod = Math.round(Timer.fps() / Const.FIXED_FRAMES);
 
 		for (i in 0...length)
 			entities[i].update();

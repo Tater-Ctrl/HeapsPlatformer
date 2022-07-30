@@ -14,12 +14,10 @@ class Camera extends Component {
     var target = new Vector2(entity.x - scene.width * 0.5, entity.y - scene.height * 0.5);
     var value = Utils.vInterp(current, target, 0.05);
 
-    value.x = clamp(value.x, target.x - 85, target.x + 85);
 
-    // var dist = 
-
-    // scene.camera.setPosition(Math.round(value.x), Math.round(value.y));
-    scene.camera.setPosition(target.x, target.y);
+    scene.camera.setPosition(Math.round(value.x), Math.round(value.y));
+    //scene.camera.setPosition(Math.floor(target.x), Math.floor(target.y));
+    //scene.camera.setPosition(scene.camera.x, scene.camera.y);
   }
 
   function clamp(value: Float, min: Float, max: Float) {

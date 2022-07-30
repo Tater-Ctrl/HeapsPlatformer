@@ -1,6 +1,5 @@
 package utils;
 
-import dn.struct.FixedArray;
 import haxe.ds.Map;
 import types.Rect;
 
@@ -11,40 +10,17 @@ class SpatialHash<T> {
   public function new() {}
 
   public function insert(object: T, rect: Rect) {
-    var keys = hashRect2(rect);
-    // var addedKeys: Array<String> = [];
+    var keys = hashRect(rect);
+    var addedKeys: Array<String> = [];
 
-    // for(k in keys) {
-    //   if (!addedKeys.contains(k)) {
-    //     if (grid.exists(k))
-    //       grid[k].push(object);
-    //     else 
-    //       grid[k] = [object];
-    //   }
-    // }
-
-    if (grid.exists(keys[0]))
-      grid[keys[0]].push(object);
-    else 
-      grid[keys[0]] = [object];
-
-    if (keys[1] != keys[0])
-      if (grid.exists(keys[1]))
-        grid[keys[1]].push(object);
-      else 
-        grid[keys[1]] = [object];
-
-    if ((keys[2] != keys[0] || keys[2] != keys[1]))
-      if (grid.exists(keys[2]))
-        grid[keys[2]].push(object);
-      else
-        grid[keys[2]] = [object];
-
-    if ((keys[3] != keys[0] || keys[3] != keys[1] || keys[3] != keys[2]))
-      if (grid.exists(keys[3]))
-        grid[keys[3]].push(object);
-      else
-        grid[keys[3]] = [object];
+    for(k in keys) {
+      if (!addedKeys.contains(k)) {
+        if (grid.exists(k))
+          grid[k].push(object);
+        else 
+          grid[k] = [object];
+      }
+    }
   }
 
   public function retrieve(rect: Rect): Array<T> {
@@ -63,7 +39,7 @@ class SpatialHash<T> {
   }
 
   
-  private function hashRect2(rect: Rect): Array<String> {
+  private function hashRect(rect: Rect): Array<String> {
     var x = Math.floor(rect.x / GRID_SIZE);
     var y = Math.floor(rect.y / GRID_SIZE);
     var w = Math.floor((rect.x + rect.w) / GRID_SIZE);

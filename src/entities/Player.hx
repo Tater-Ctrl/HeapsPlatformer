@@ -19,7 +19,7 @@ class Player extends Entity {
   private var collider: Collider;
   private var camera: Camera;
 
-  private var speed: Float = 300.;
+  private var speed: Float = 10.;
 
   public function new() {
     super();
@@ -32,6 +32,7 @@ class Player extends Entity {
     camera    = addComponent(Camera);
     
     body.gravityEnabled = true;
+    body.collisionEnabled = true;
     
     body.collider = collider;
     collider.setRect(new Rect(20, 10, 25, 25));
@@ -46,7 +47,7 @@ class Player extends Entity {
   override function fixedUpdate() {
     super.fixedUpdate();
 
-    body.movePosition(input.moveDirection * speed * Time.fixedDeltaTime);
+    body.movePosition(input.moveDirection, speed);
   }
 
   public function jump() {

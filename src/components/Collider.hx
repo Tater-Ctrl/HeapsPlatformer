@@ -33,12 +33,12 @@ class Collider extends Component {
       graphics.drawRect(r.x, r.y, r.w, r.h);
       debug = false;
     }
-
   }
   
   public function activeCol() {
     if (collisionMode == CollisionMode.STATIC) {
       Game.addStaticCollider(this);
+      Game.allColliders.push(this);
     }
   }
 

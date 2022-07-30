@@ -1,12 +1,11 @@
 package components;
 
-import h2d.Graphics;
-import utils.Utils;
-import utils.Time;
 import types.Rect;
+import utils.Time;
 import types.Vector2;
 
 class Rigidbody2D extends Component {
+  public var collisionEnabled: Bool = true;
   public var gravityEnabled: Bool = true;
   public var gravity: Float = 30;
   public var isGrounded: Bool = false;
@@ -16,12 +15,14 @@ class Rigidbody2D extends Component {
   private var jumpForce: Float = 0.;
   private var velocity: Vector2 = new Vector2(0., 0.);
   private var moveDirection: Vector2 = new Vector2(0, 0);
+  private var moveSpeed: Float = 0.;
   private var actualVelocity: Vector2 = new Vector2(0, 0);
 
   private var targetPosition: Vector2 = new Vector2(0, 0);
 
-  public function movePosition(direction: Vector2) {
-    moveDirection = direction;
+  public function movePosition(direction: Vector2, speed: Float) {
+    moveSpeed = speed;
+    moveDirection = direction * speed;
   }
 
   override function awake() {
@@ -29,19 +30,24 @@ class Rigidbody2D extends Component {
     targetPosition = entity.position;
   }
 
-  private function moveRigidBody() {
-    entity.x += Math.round(actualVelocity.x);
-    entity.y += Math.round(actualVelocity.y);
-    
-    actualVelocity.x = 0;
-    actualVelocity.y = 0;
+  private function interpolateBody() {
+    var posX = clampedValue(entity.position.x, targetPosition.x);
+    var posY = clampedValue(entity.position.y, targetPosition.y);
+
+    entity.x = Math.round(entity.x - posX);
+    entity.y = targetPosition.y;
+    //entity.y = Math.round(entity.y - posY);
   }
 
-  private function interpolateBody() {
-    var interpPos = Utils.vInterp(entity.position, targetPosition, Time.fMod);
+  private function clampedValue(a: Float, b: Float): Int {
+    var val = (a - b) / Time.fMod;
 
-    entity.x = interpPos.x;
-    entity.y = Math.ceil(interpPos.y);
+    if (val > 0)
+      return Math.round(Math.min(val, moveSpeed / 2));
+    else if (val < 0)
+      return Math.round(Math.max(val, -moveSpeed / 2));
+    
+    return 0;
   }
 
   /**
@@ -56,14 +62,13 @@ class Rigidbody2D extends Component {
   }
   
   override function fixedUpdate() {
-    targetPosition = entity.position;
-
     if (gravityEnabled)
       applyGravity();
 
     actualVelocity += velocity + moveDirection;
 
-    checkCollision();
+    if (collisionEnabled)
+      checkCollision();
 
     targetPosition.x += actualVelocity.x;
     targetPosition.y += actualVelocity.y;
@@ -74,11 +79,11 @@ class Rigidbody2D extends Component {
 
   private function checkCollision() {
     isGrounded = false;
-    var start = Sys.time() * 1000;
     if (collider != null) {
       // var r1 = new Rect(targetPosition.x, targetPosition.y, collider.rect.w, collider.rect.h);
       var r1 = collider.getRect();
-      var bodies = Game.getStaticColliders(r1.addMargin(-5));
+      var margin = Math.max(Math.abs(actualVelocity.x), Math.abs(actualVelocity.y));
+      var bodies = Game.allColliders; // Game.getStaticColliders(r1.addMargin(5));
 
       for (i in 0...bodies.length) {
         var r2 = bodies[i].getRect();
@@ -86,36 +91,36 @@ class Rigidbody2D extends Component {
         if (Collider.checkSphereCollision(r1, r2)) {
           var hitHor = Collider.checkAABBCollision(r1, r2, new Vector2(actualVelocity.x, 0));
           if (hitHor) {
-            if (actualVelocity.x > 0) {
-              var offset = r1.x + r1.w + actualVelocity.x - r2.x;
-              actualVelocity.x -= offset;
+            var overlap = r1.x - r2.x;
+            if (overlap < 0) {
+              actualVelocity.x = 0;
+              targetPosition.x = r2.x - (collider.rect.x + collider.rect.w);
             }
-            else if (actualVelocity.x < 0) {
-              var offset = r1.x + actualVelocity.x - (r2.x + r2.w);
-              actualVelocity.x -= offset;
+            if (overlap > 0) {
+              actualVelocity.x = 0;
+              targetPosition.x = (r2.x + r2.w) - collider.rect.x;
             }
           }
-  
+          
+          r1 = collider.getRect();
           var hitVer = Collider.checkAABBCollision(r1, r2, new Vector2(0, actualVelocity.y));
           if (hitVer) {
-            if (actualVelocity.y > 0) {
+            var overlap = r1.y - r2.y;
+            if (overlap < 0) {
               isGrounded = true;
-              var offset = r1.y + r1.h + actualVelocity.y - r2.y;
-              actualVelocity.y -= offset;
+              actualVelocity.y = 0;
+              targetPosition.y = r2.y - (collider.rect.y + collider.rect.h);
             }
-            else if (actualVelocity.y < 0) {
+            else if (overlap > 0) {
               jumpForce = 0;
               velocity.y = 0;
-              var offset = r1.y + actualVelocity.y - (r2.y + r2.h);
-              actualVelocity.y -= offset;
+              actualVelocity.y = 0;
+              targetPosition.y = (r2.y + r2.h) - collider.rect.y;
             }
           }
         }
       }
     }
-
-    var end = Sys.time() * 1000;
-    trace(end - start);
   }
 
   private function applyGravity() {
