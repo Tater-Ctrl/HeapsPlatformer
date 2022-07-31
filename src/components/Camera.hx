@@ -4,30 +4,29 @@ import entities.Entity;
 import utils.Utils;
 import types.Vector2;
 
-enum CameraFollowMode {
-  STATIC(target:Entity);
+enum CameraMode {
+  STATIC(x: Float, y: Float);
   INTERPOLATED(target:Entity, time:Float);
 }
 
 class Camera extends Component {
-  public var followMode: CameraFollowMode;
+  public var mode: CameraMode;
 
   override function draw() {
-    if (followMode == null)
+    if (mode == null)
       return;
 
-    switch(followMode) {
-      case STATIC(target):
-        staticFollow(target);
+    switch(mode) {
+      case STATIC(x, y):
+        staticFollow(x, y);
       case INTERPOLATED(target, time):
         interpolatedFollow(target, time);
     }
   }
 
-  private function staticFollow(target: Entity) {
+  private function staticFollow(xPos: Float, yPos: Float) {
     var scene = Game.getScene();
-    var pos = new Vector2(target.x - scene.width * 0.5, target.y - scene.height * 0.5);
-    scene.camera.setPosition(pos.x, pos.y);
+    scene.camera.setPosition(xPos, yPos);
   }
 
   private function interpolatedFollow(target: Entity, time: Float) {

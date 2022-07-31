@@ -27,6 +27,13 @@ abstract Vector2(Array<Float>) {
     return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
   }
 
+  public function floor(): Vector2 {
+    return new Vector2(
+      Math.floor(x),
+      Math.floor(y)
+    );
+  }
+
   public function toString(): String {
     return "X: " + Std.string(x) + ", Y: " + Std.string(y); 
   }

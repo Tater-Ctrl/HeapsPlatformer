@@ -9,11 +9,12 @@ class Platform extends Entity {
     super();
 
     collider = addComponent(Collider);
+    collider.collisionMode = CollisionMode.TILEMAP;
   }
 
   public function createCollider(rect: Rect):Void {
     if (collider != null) {
-      collider.setRect(rect); 
+      collider.setRect(rect);
     }
   }
 }

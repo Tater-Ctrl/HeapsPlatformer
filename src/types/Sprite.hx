@@ -1,7 +1,6 @@
 package types;
 
-import utils.Time;
-import utils.Utils;
+import entities.Level;
 import h2d.Tile;
 import h2d.Bitmap;
 
@@ -20,13 +19,10 @@ class Sprite extends h2d.Drawable {
   public function new(tile: Tile) {
     super(Game.getScene());
     bitmap = new Bitmap(tile, this);
-
+    Level.addLayer(this, 0);
   }
 
   public function setPos(x: Float, y: Float) {
-    // var add = new Vector2(x - this.x, y - this.y) * Time.fMod;
-
-    // setPosition(Math.floor(this.x + add.x), Math.floor(this.y + add.y));
     setPosition(x, y);
   }
 }

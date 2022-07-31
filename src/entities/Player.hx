@@ -19,7 +19,7 @@ class Player extends Entity {
   private var collider: Collider;
   private var camera: Camera;
 
-  private var speed: Float = 8.;
+  private var speed: Float = 4.;
 
   public function new() {
     super();
@@ -31,29 +31,29 @@ class Player extends Entity {
     collider  = addComponent(Collider);
     camera    = addComponent(Camera);
     
-    camera.followMode = CameraFollowMode.INTERPOLATED(this, 0.1);
+    camera.mode = CameraMode.STATIC(0, 0);
 
     body.gravityEnabled = true;
     body.collisionEnabled = true;
     body.collider = collider;
     
-    collider.setRect(new Rect(21, 10, 23, 25));
+    collider.setRect(new Rect(0, 0, 16, 16));
     collider.collisionMode = CollisionMode.DYNAMIC;
     
-    var tile = Res.img.SmolBunHop2.toTile();
-    sprite.setSprite(tile.sub(0, 0, tile.width / 3, tile.height));
+    var tile = Res.img.traveler.toTile();
+    sprite.setSprite(tile.sub(0, 0, tile.width / 6, tile.height / 8));
 
     input.Jump = jump;
   }
 
   override function fixedUpdate() {
     super.fixedUpdate();
-    body.movePosition(input.moveDirection, speed);
+    body.movePosition(input.moveDirection * speed);
   }
 
   public function jump() {
     if (body.isGround) {
-      body.jump(20);
+      body.jump(7);
     }
   }
 }

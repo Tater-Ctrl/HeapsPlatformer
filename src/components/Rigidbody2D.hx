@@ -1,13 +1,14 @@
 package components;
 
-import hxd.Window;
+import entities.Level;
+import hxd.Timer;
 import types.Rect;
 import types.Vector2;
 
 class Rigidbody2D extends Component {
   public var collisionEnabled: Bool = true;
   public var gravityEnabled: Bool = true;
-  public var gravity: Int = 1;
+  public var gravity: Float = 0.8;
   public var isGround: Bool = false;
   public var isCeil: Bool = false;
   public var isWallRight: Bool = false;
@@ -15,19 +16,18 @@ class Rigidbody2D extends Component {
   public var collider: Collider;
 
   // Different forces that affect the rigidbody
-  private var jumpForce: Int = 0;
+  private var jumpForce: Float = 0;
+  private var gravityAccum: Float = 0.;
+
   private var velocity: Vector2 = new Vector2(0., 0.);
   private var moveDirection: Vector2 = new Vector2(0, 0);
-  private var moveSpeed: Float = 0.;
   private var actualVelocity: Vector2 = new Vector2(0, 0);
 
   private var startPosition: Vector2 = new Vector2(0, 0);
   private var targetPosition: Vector2 = new Vector2(0, 0);
-  private var interpAmount: Float = 0.;
 
-  public function movePosition(direction: Vector2, speed: Float) {
-    moveSpeed = speed;
-    moveDirection = direction * speed;
+  public function movePosition(direction: Vector2) {
+    moveDirection = direction;
   }
 
   override function awake() {
@@ -36,12 +36,10 @@ class Rigidbody2D extends Component {
   }
 
   private function interpolateBody() {
-    var screenMultiplier = Const.RENDER_WIDTH / Window.getInstance().width;
+    var mod = Timer.tmod / 2;
 
-    interpAmount += hxd.Timer.tmod * screenMultiplier;
-
-    entity.x += (targetPosition.x - startPosition.x) * 0.5 * screenMultiplier;
-    entity.y += (targetPosition.y - startPosition.y) * 0.5 * screenMultiplier;
+    entity.x += (targetPosition.x - startPosition.x) * mod;
+    entity.y += (targetPosition.y - startPosition.y) * mod;
   }
 
   /**
@@ -56,7 +54,6 @@ class Rigidbody2D extends Component {
   }
   
   override function fixedUpdate() {
-    interpAmount = 0.;
     startPosition = entity.position;
 
     if (gravityEnabled)
@@ -86,13 +83,13 @@ class Rigidbody2D extends Component {
 
     if (collider != null) {
       var r1 = new Rect(
-        entity.x + collider.rect.x, 
-        entity.y + collider.rect.y, 
+        targetPosition.x + collider.rect.x, 
+        targetPosition.y + collider.rect.y, 
         collider.rect.w, 
         collider.rect.h);
 
-      var bodies = Game.getStaticColliders(r1);
-
+      var bodies = Level.getTilemapColliders(r1);
+      trace(bodies.length);
       for (i in 0...bodies.length) {
         var r2 = bodies[i].getRect();
 
@@ -138,7 +135,7 @@ class Rigidbody2D extends Component {
   }
 
   private function applyGravity() {
-    velocity.y += gravity;
+    gravityAccum += gravity;
 
     if (isGround)
       velocity.y = 0.1;
@@ -149,11 +146,14 @@ class Rigidbody2D extends Component {
 
     if (jumpForce > 0) {
       velocity.y = -jumpForce;
-      jumpForce -= gravity;
+      
+      if (gravityAccum > 1)
+        jumpForce -= gravity;
     }
 
-    if (velocity.y > 20) {
-      velocity.y = 20;
+    if (gravityAccum > 1) {
+      gravityAccum = 0;
+      velocity.y += gravity;
     }
   }
 }

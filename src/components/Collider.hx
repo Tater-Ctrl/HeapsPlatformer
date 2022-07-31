@@ -1,5 +1,6 @@
 package components;
 
+import entities.Level;
 import h2d.Graphics;
 import types.Rect;
 import types.Vector2;
@@ -7,6 +8,7 @@ import types.Vector2;
 enum CollisionMode {
   STATIC;
   DYNAMIC;
+  TILEMAP;
 }
 
 enum CollisionShape {
@@ -31,14 +33,18 @@ class Collider extends Component {
       graphics.beginFill(0xFFFFFF);
       var r = getRect();
       graphics.drawRect(r.x, r.y, r.w, r.h);
-      debug = false;
+      graphics.endFill();
     }
+  }
+
+  override function awake() {
+    super.awake();
+    activeCol();
   }
   
   public function activeCol() {
-    if (collisionMode == CollisionMode.STATIC) {
-      Game.addStaticCollider(this);
-      Game.allColliders.push(this);
+    if (collisionMode == CollisionMode.TILEMAP) {
+      Level.addTilemapCollider(this);
     }
   }
 

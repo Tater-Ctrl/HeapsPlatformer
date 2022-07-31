@@ -38,6 +38,10 @@ class SpatialHash<T> {
     return objects;
   }
 
+  public function clear() {
+    grid.clear();
+  }
+
   
   private function hashRect(rect: Rect): Array<String> {
     var x = Math.floor(rect.x / GRID_SIZE);
