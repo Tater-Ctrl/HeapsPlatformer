@@ -9,7 +9,7 @@ class InputComponent extends Component {
 
   override function update() {
     updateMoveDirection();
-
+    
     if (Key.isPressed(Key.SPACE) && Jump != null) {
       Jump();
     }

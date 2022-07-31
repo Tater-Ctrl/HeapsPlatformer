@@ -7,17 +7,19 @@ import types.Vector2;
 class Rigidbody2D extends Component {
   public var collisionEnabled: Bool = true;
   public var gravityEnabled: Bool = true;
-  public var gravity: Float = 30;
-  public var isGrounded: Bool = false;
+  public var gravity: Int = 1;
+  public var isGround: Bool = false;
+  public var isCeil: Bool = false;
+  public var isWallRight: Bool = false;
+  public var isWallLeft: Bool = false;
   public var collider: Collider;
 
   // Different forces that affect the rigidbody
-  private var jumpForce: Float = 0.;
+  private var jumpForce: Int = 0;
   private var velocity: Vector2 = new Vector2(0., 0.);
   private var moveDirection: Vector2 = new Vector2(0, 0);
   private var moveSpeed: Float = 0.;
   private var actualVelocity: Vector2 = new Vector2(0, 0);
-
   private var targetPosition: Vector2 = new Vector2(0, 0);
 
   public function movePosition(direction: Vector2, speed: Float) {
@@ -31,21 +33,20 @@ class Rigidbody2D extends Component {
   }
 
   private function interpolateBody() {
-    var posX = clampedValue(entity.position.x, targetPosition.x);
-    var posY = clampedValue(entity.position.y, targetPosition.y);
+    var posX = clampedValue(entity.position.x, targetPosition.x, moveSpeed);
+    var posY = clampedValue(entity.position.y, targetPosition.y, 30);
 
-    entity.x = Math.round(entity.x - posX);
-    entity.y = targetPosition.y;
-    //entity.y = Math.round(entity.y - posY);
+    entity.x -= Math.floor(posX);
+    entity.y -= Math.floor(posY);
   }
 
-  private function clampedValue(a: Float, b: Float): Int {
+  private function clampedValue(a: Float, b: Float, max: Float): Int {
     var val = (a - b) / Time.fMod;
 
     if (val > 0)
-      return Math.round(Math.min(val, moveSpeed / 2));
+      return Math.round(Math.min(val, max / 2));
     else if (val < 0)
-      return Math.round(Math.max(val, -moveSpeed / 2));
+      return Math.round(Math.max(val, -max / 2));
     
     return 0;
   }
@@ -53,7 +54,7 @@ class Rigidbody2D extends Component {
   /**
     Currently dependent on gravity being enabled to function
   **/
-  public function jump(force: Float) {
+  public function jump(force: Int) {
     jumpForce = force;
   }
 
@@ -77,13 +78,24 @@ class Rigidbody2D extends Component {
     actualVelocity.y = 0;
   }
 
+  private function resetCollisionFlags() {
+    isGround = false;
+    isCeil = false;
+    isWallRight = false;
+    isWallLeft = false;
+  }
+
   private function checkCollision() {
-    isGrounded = false;
+    resetCollisionFlags();
+
     if (collider != null) {
-      // var r1 = new Rect(targetPosition.x, targetPosition.y, collider.rect.w, collider.rect.h);
-      var r1 = collider.getRect();
-      var margin = Math.max(Math.abs(actualVelocity.x), Math.abs(actualVelocity.y));
-      var bodies = Game.allColliders; // Game.getStaticColliders(r1.addMargin(5));
+      var r1 = new Rect(
+        targetPosition.x + collider.rect.x, 
+        targetPosition.y + collider.rect.y, 
+        collider.rect.w, 
+        collider.rect.h);
+
+      var bodies = Game.getStaticColliders(r1);
 
       for (i in 0...bodies.length) {
         var r2 = bodies[i].getRect();
@@ -95,25 +107,31 @@ class Rigidbody2D extends Component {
             if (overlap < 0) {
               actualVelocity.x = 0;
               targetPosition.x = r2.x - (collider.rect.x + collider.rect.w);
+              isWallRight = true;
             }
             if (overlap > 0) {
               actualVelocity.x = 0;
               targetPosition.x = (r2.x + r2.w) - collider.rect.x;
+              isWallLeft = true;
             }
           }
           
-          r1 = collider.getRect();
+          r1 = new Rect(
+            targetPosition.x + collider.rect.x, 
+            targetPosition.y + collider.rect.y, 
+            collider.rect.w, 
+            collider.rect.h);
+          
           var hitVer = Collider.checkAABBCollision(r1, r2, new Vector2(0, actualVelocity.y));
           if (hitVer) {
             var overlap = r1.y - r2.y;
             if (overlap < 0) {
-              isGrounded = true;
+              isGround = true;
               actualVelocity.y = 0;
               targetPosition.y = r2.y - (collider.rect.y + collider.rect.h);
             }
             else if (overlap > 0) {
-              jumpForce = 0;
-              velocity.y = 0;
+              isCeil = true;
               actualVelocity.y = 0;
               targetPosition.y = (r2.y + r2.h) - collider.rect.y;
             }
@@ -124,18 +142,22 @@ class Rigidbody2D extends Component {
   }
 
   private function applyGravity() {
+    velocity.y += gravity;
+
+    if (isGround)
+      velocity.y = 0.1;
+    else if (isCeil) {
+      velocity.y = 0;
+      jumpForce = 0;
+    }
+
     if (jumpForce > 0) {
       velocity.y = -jumpForce;
-      jumpForce -= gravity * Time.fixedDeltaTime;
-    } else if (isGrounded) {
-      velocity.y = 0.1;
+      jumpForce -= gravity;
     }
-    else {
-      velocity.y += gravity * Time.fixedDeltaTime;
 
-      if (velocity.y > gravity) {
-        velocity.y = gravity;
-      }
+    if (velocity.y > 20) {
+      velocity.y = 20;
     }
   }
 }

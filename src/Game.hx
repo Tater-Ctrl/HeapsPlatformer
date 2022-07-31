@@ -111,7 +111,8 @@ class Game extends hxd.App {
 
 	override function update(dt:Float) {
 		var length:Int = entities.length;
-    
+
+    Time.deltaTime = dt;
     Time.fixedDeltaTime += dt;
     Time.fMod = Math.round(Timer.fps() / Const.FIXED_FRAMES);
 

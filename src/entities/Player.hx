@@ -35,7 +35,7 @@ class Player extends Entity {
     body.collisionEnabled = true;
     
     body.collider = collider;
-    collider.setRect(new Rect(20, 10, 25, 25));
+    collider.setRect(new Rect(21, 10, 23, 24));
     collider.collisionMode = CollisionMode.DYNAMIC;
     
     var tile = Res.img.SmolBunHop2.toTile();
@@ -46,12 +46,11 @@ class Player extends Entity {
 
   override function fixedUpdate() {
     super.fixedUpdate();
-
     body.movePosition(input.moveDirection, speed);
   }
 
   public function jump() {
-    if (body.isGrounded) {
+    if (body.isGround) {
       body.jump(20);
     }
   }
