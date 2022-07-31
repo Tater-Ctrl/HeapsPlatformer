@@ -1,3 +1,4 @@
+import hxd.Key;
 import entities.Level;
 import h2d.Graphics;
 import h2d.RenderContext;
@@ -32,14 +33,18 @@ class Game extends hxd.App {
     s2d.scaleMode = LetterBox(Const.RENDER_WIDTH, Const.RENDER_HEIGHT, false);
 
     new Level();
-
-    var entities = Level.getEntities();
-    if (entities != null)
-      for (i in 0...entities.length)
-        entities[i].awake();
 	}
 
+  private function editorInput() {
+    if (Key.isPressed(Key.P))
+      Level.unload();
+    if (Key.isPressed(Key.L))
+      Level.load();
+  }
+
 	override function update(dt:Float) {
+    editorInput();
+
     Time.deltaTime = dt;
     Time.fixedDeltaTime += dt;
     Time.fMod = Math.round(Timer.fps() / Const.FIXED_FRAMES);

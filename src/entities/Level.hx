@@ -1,5 +1,6 @@
 package entities;
 
+import components.TileCollider;
 import h2d.Graphics;
 import h2d.Object;
 import components.Collider;
@@ -43,27 +44,33 @@ class Level {
     load();
   }
 
-  public function load() {
+  public static function load() {
     var backgroundLayer = loader.all_levels.PlayTest.l_Background;
     var collisionLayer = loader.all_levels.PlayTest.l_Collision;
-    createLevelColliders(collisionLayer);
+    Level.instance.createLevelColliders(collisionLayer);
 
 		var player = Level.createEntity(Player);
-    player.setPosition(55, 55);
+    player.setPosition(60, 100);
     
-    layer.add(collisionLayer.render(), 0);
-    layer.add(backgroundLayer.render(), -1);
-    layer.add(debugger, -1);
+    Level.instance.layer.add(collisionLayer.render(), 0);
+    Level.instance.layer.add(backgroundLayer.render(), -1);
+    Level.instance.layer.add(Level.instance.debugger, -1);
+    
+    var entities = Level.getEntities();
+    if (entities != null)
+      for (i in 0...entities.length)
+        entities[i].awake();
   }
 
-  public function unload() {
-    backgroundLayer = null;
-    collisionLayer = null;
-    foregroundLayer = null;
+  public static function unload() {
+    Level.instance.backgroundLayer = null;
+    Level.instance.collisionLayer = null;
+    Level.instance.foregroundLayer = null;
+    Level.instance.entities = new Array<Entity>();
 
-    tilemapColliders.clear();
-
-    layer.removeChildren();
+    Level.instance.tilemapColliders.clear();
+    Level.instance.layer.removeChildren();
+    Game.getScene().dispose();
   }
 
   public static function addLayer(object: Object, layer: Int) {
@@ -79,7 +86,7 @@ class Level {
   }
 
   public static function addTilemapCollider(col: Collider) {
-    Level.instance.tilemapColliders.insert(col, col.getRect());
+    Level.instance.tilemapColliders.insert(col, col.getBounds());
   }
 
   public static function getTilemapColliders(rect: Rect): Array<Collider> {
@@ -106,9 +113,9 @@ class Level {
         if (!tiles.hasValue(cx, cy))
           continue;
 
-        var entity = createEntity(Platform);
-        entity.setPosition(cx * 8, cy * 8);
-        entity.createCollider(new Rect(0, 0, 8, 8));
+        var tile = createEntity(Tile);
+        tile.setPosition(cx * 8, cy * 8);
+        tile.createCollider(new Rect(0, 0, 8, 8));
       }
     }
   }

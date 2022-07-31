@@ -1,5 +1,6 @@
 package components;
 
+import entities.Level;
 import hxd.Key;
 import types.Vector2;
 

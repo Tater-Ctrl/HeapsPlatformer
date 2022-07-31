@@ -89,9 +89,8 @@ class Rigidbody2D extends Component {
         collider.rect.h);
 
       var bodies = Level.getTilemapColliders(r1);
-      trace(bodies.length);
       for (i in 0...bodies.length) {
-        var r2 = bodies[i].getRect();
+        var r2 = bodies[i].getBounds();
 
         if (Collider.checkSphereCollision(r1, r2)) {
           var hitHor = Collider.checkAABBCollision(r1, r2, new Vector2(actualVelocity.x, 0));

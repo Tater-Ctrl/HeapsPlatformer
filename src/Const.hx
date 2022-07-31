@@ -5,4 +5,6 @@ class Const {
 
   public static var RENDER_HEIGHT(default, never) = 180;
   public static var RENDER_WIDTH(default, never) = 320;
+
+  public static var DEFAULT_TILE_SIZE(default, never) = 8;
 }

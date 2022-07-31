@@ -20,18 +20,12 @@ class Collider extends Component {
   public var rect: Rect;
   public var margin: Vector2 = new Vector2(10, 5);
   public var collisionMode: CollisionMode = CollisionMode.STATIC;
-  
-  public var yMin(get, null):Float;
-  public var xMax(get, null):Float;
-  public var xMin(get, null):Float;
-  public var yMax(get, null):Float;
-
   public var debug: Bool = false;
 
   override function drawGizmos(graphics:Graphics) {
     if (debug) {
       graphics.beginFill(0xFFFFFF);
-      var r = getRect();
+      var r = getBounds();
       graphics.drawRect(r.x, r.y, r.w, r.h);
       graphics.endFill();
     }
@@ -39,16 +33,12 @@ class Collider extends Component {
 
   override function awake() {
     super.awake();
-    activeCol();
-  }
-  
-  public function activeCol() {
     if (collisionMode == CollisionMode.TILEMAP) {
       Level.addTilemapCollider(this);
     }
   }
 
-  public function getRect(): Rect {
+  public function getBounds(): Rect {
     return new Rect(
       entity.x + rect.x,
       entity.y + rect.y,
@@ -57,7 +47,11 @@ class Collider extends Component {
     );
   }
 
-  public function setRect(rect: Rect) {
+  public function getRawBounds(): Rect {
+    return rect;
+  }
+
+  public function setBounds(rect: Rect) {
     this.rect = rect;
   }
 
@@ -77,27 +71,10 @@ class Collider extends Component {
     Checks if point is overlappping the collisionbody, returns the amount of overlap in a Vector2
   **/
   public static function isPointOverlapping(point: Vector2, col: Collider):Bool {
-    var rect = col.getRect();
+    var rect = col.getBounds();
     return point.x >= rect.x 
       && point.x <= rect.x + rect.w
       && point.y >= rect.y 
       && point.y <= rect.y + rect.h;
   }
-
-	function get_yMin():Float {
-		return entity.y + rect.y;
-	}
-
-  function get_xMin():Float {
-    return entity.x + rect.x;
-  }
-
-	function get_xMax():Float {
-		return entity.x + (rect.x + rect.w);
-	}
-
-
-	function get_yMax():Float {
-		return entity.y + (rect.y + rect.h);
-	}
 }

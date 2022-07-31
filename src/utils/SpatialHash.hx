@@ -4,7 +4,7 @@ import haxe.ds.Map;
 import types.Rect;
 
 class SpatialHash<T> {
-  public var GRID_SIZE:Int = 64;
+  public var GRID_SIZE:Int = 16;
   public var grid:Map<String, Array<T>> = new Map();
 
   public function new() {}

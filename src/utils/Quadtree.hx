@@ -45,7 +45,7 @@ class Quadtree {
 
   public function insert(body: Collider) {
     if (nodes[0] != null) {
-      var index = getIndex(body.getRect());
+      var index = getIndex(body.getBounds());
 
       if (index != -1) {
         nodes[index].insert(body);
@@ -62,7 +62,7 @@ class Quadtree {
 
       var i: Int = 0;
       while(i < objects.length) {
-        var index: Int = getIndex(objects[i].getRect());
+        var index: Int = getIndex(objects[i].getBounds());
 
         if (index != -1) {
           nodes[index].insert(objects.splice(i, 1)[0]);

@@ -37,7 +37,7 @@ class Player extends Entity {
     body.collisionEnabled = true;
     body.collider = collider;
     
-    collider.setRect(new Rect(0, 0, 16, 16));
+    collider.setBounds(new Rect(0, 0, 16, 16));
     collider.collisionMode = CollisionMode.DYNAMIC;
     
     var tile = Res.img.traveler.toTile();
