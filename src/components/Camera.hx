@@ -1,28 +1,43 @@
 package components;
 
+import entities.Entity;
 import utils.Utils;
 import types.Vector2;
 
-class Camera extends Component {
+enum CameraFollowMode {
+  STATIC(target:Entity);
+  INTERPOLATED(target:Entity, time:Float);
+}
 
-  public var camera(get, null): h2d.Camera;
-  public inline function get_camera() return Game.getScene().camera;
+class Camera extends Component {
+  public var followMode: CameraFollowMode;
 
   override function draw() {
-    var scene = Game.getScene();
-    var current = new Vector2(scene.camera.x, scene.camera.y);
-    var target = new Vector2(entity.x - scene.width * 0.5, entity.y - scene.height * 0.5);
-    var value = Utils.vInterp2(current, target, 0.05);
+    if (followMode == null)
+      return;
 
-    // scene.camera.setPosition(Math.round(value.x), Math.round(value.y));
-    //scene.camera.setPosition(Math.floor(target.x), Math.floor(target.y));
+    switch(followMode) {
+      case STATIC(target):
+        staticFollow(target);
+      case INTERPOLATED(target, time):
+        interpolatedFollow(target, time);
+    }
   }
 
-  function clamp(value: Float, min: Float, max: Float) {
-    if (value > max)
-      return max;
-    if (value < min)
-      return min;
-    return value;
+  private function staticFollow(target: Entity) {
+    var scene = Game.getScene();
+    var pos = new Vector2(target.x - scene.width * 0.5, target.y - scene.height * 0.5);
+    scene.camera.setPosition(pos.x, pos.y);
+  }
+
+  private function interpolatedFollow(target: Entity, time: Float) {
+    var scene = Game.getScene();
+    var camPos = new Vector2(scene.camera.x, scene.camera.y);
+    var curPos = new Vector2(target.x - scene.width * 0.5, target.y - scene.height * 0.5);
+    var midpoint = (curPos * 0.5) + (camPos * 0.5);
+    var value = Utils.vInterp(camPos, midpoint, time);
+    var position = camPos + (value - camPos);
+
+    scene.camera.setPosition(position.x, position.y);
   }
 }

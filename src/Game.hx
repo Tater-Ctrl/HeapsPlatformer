@@ -116,16 +116,16 @@ class Game extends hxd.App {
     Time.fixedDeltaTime += dt;
     Time.fMod = Math.round(Timer.fps() / Const.FIXED_FRAMES);
 
-		for (i in 0...length)
-			entities[i].update();
-
+    
 		while (Time.fixedDeltaTime >= Const.FIXED_TIME_STEP) {
-			for (i in 0...length)
+      for (i in 0...length)
 				entities[i].fixedUpdate();
-
+      
 			Time.fixedDeltaTime -= Const.FIXED_TIME_STEP;
 		}
-
+    for (i in 0...length)
+      entities[i].update();
+    
 		for (i in 0...length)
 			entities[i].draw();
 

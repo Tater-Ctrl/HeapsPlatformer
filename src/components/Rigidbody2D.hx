@@ -1,7 +1,7 @@
 package components;
 
+import hxd.Window;
 import types.Rect;
-import utils.Time;
 import types.Vector2;
 
 class Rigidbody2D extends Component {
@@ -20,7 +20,10 @@ class Rigidbody2D extends Component {
   private var moveDirection: Vector2 = new Vector2(0, 0);
   private var moveSpeed: Float = 0.;
   private var actualVelocity: Vector2 = new Vector2(0, 0);
+
+  private var startPosition: Vector2 = new Vector2(0, 0);
   private var targetPosition: Vector2 = new Vector2(0, 0);
+  private var interpAmount: Float = 0.;
 
   public function movePosition(direction: Vector2, speed: Float) {
     moveSpeed = speed;
@@ -33,22 +36,12 @@ class Rigidbody2D extends Component {
   }
 
   private function interpolateBody() {
-    var posX = clampedValue(entity.position.x, targetPosition.x, moveSpeed);
-    var posY = clampedValue(entity.position.y, targetPosition.y, 30);
+    var screenMultiplier = Const.RENDER_WIDTH / Window.getInstance().width;
 
-    entity.x -= Math.floor(posX);
-    entity.y -= Math.floor(posY);
-  }
+    interpAmount += hxd.Timer.tmod * screenMultiplier;
 
-  private function clampedValue(a: Float, b: Float, max: Float): Int {
-    var val = (a - b) / Time.fMod;
-
-    if (val > 0)
-      return Math.round(Math.min(val, max / 2));
-    else if (val < 0)
-      return Math.round(Math.max(val, -max / 2));
-    
-    return 0;
+    entity.x += (targetPosition.x - startPosition.x) * 0.5 * screenMultiplier;
+    entity.y += (targetPosition.y - startPosition.y) * 0.5 * screenMultiplier;
   }
 
   /**
@@ -63,6 +56,9 @@ class Rigidbody2D extends Component {
   }
   
   override function fixedUpdate() {
+    interpAmount = 0.;
+    startPosition = entity.position;
+
     if (gravityEnabled)
       applyGravity();
 
@@ -90,8 +86,8 @@ class Rigidbody2D extends Component {
 
     if (collider != null) {
       var r1 = new Rect(
-        targetPosition.x + collider.rect.x, 
-        targetPosition.y + collider.rect.y, 
+        entity.x + collider.rect.x, 
+        entity.y + collider.rect.y, 
         collider.rect.w, 
         collider.rect.h);
 

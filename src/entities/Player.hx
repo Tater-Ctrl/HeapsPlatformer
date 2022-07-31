@@ -19,7 +19,7 @@ class Player extends Entity {
   private var collider: Collider;
   private var camera: Camera;
 
-  private var speed: Float = 10.;
+  private var speed: Float = 8.;
 
   public function new() {
     super();
@@ -31,11 +31,13 @@ class Player extends Entity {
     collider  = addComponent(Collider);
     camera    = addComponent(Camera);
     
+    camera.followMode = CameraFollowMode.INTERPOLATED(this, 0.1);
+
     body.gravityEnabled = true;
     body.collisionEnabled = true;
-    
     body.collider = collider;
-    collider.setRect(new Rect(21, 10, 23, 24));
+    
+    collider.setRect(new Rect(21, 10, 23, 25));
     collider.collisionMode = CollisionMode.DYNAMIC;
     
     var tile = Res.img.SmolBunHop2.toTile();
