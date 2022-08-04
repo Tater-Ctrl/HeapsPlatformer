@@ -45,16 +45,24 @@ class Level {
   }
 
   public static function load() {
+    var backgroundImage = loader.all_levels.PlayTest.getBgBitmap();
     var backgroundLayer = loader.all_levels.PlayTest.l_Background;
     var collisionLayer = loader.all_levels.PlayTest.l_Collision;
+    var spikeLayer = loader.all_levels.PlayTest.l_Spikes;
     Level.instance.createLevelColliders(collisionLayer);
+    Level.instance.createSpikeCollider(spikeLayer);
 
 		var player = Level.createEntity(Player);
     player.setPosition(60, 100);
     
+    if (backgroundImage != null)
+      Level.instance.layer.add(backgroundImage, 0);
+    
     Level.instance.layer.add(collisionLayer.render(), 0);
-    Level.instance.layer.add(backgroundLayer.render(), -1);
+    Level.instance.layer.add(backgroundLayer.render(), 0);
     Level.instance.layer.add(Level.instance.debugger, -1);
+    Level.instance.layer.add(spikeLayer.render(), 0);
+
     
     var entities = Level.getEntities();
     if (entities != null)
@@ -116,6 +124,21 @@ class Level {
         var tile = createEntity(Tile);
         tile.setPosition(cx * 8, cy * 8);
         tile.createCollider(new Rect(0, 0, 8, 8));
+      }
+    }
+  }
+
+  private function createSpikeCollider(tiles: Grid) {
+    for(cx in 0...tiles.cWid) {
+      for (cy in 0...tiles.cHei) {
+        if (!tiles.hasValue(cx, cy))
+          continue;
+
+        trace("Spawn Spike");
+        var tile = createEntity(Spike);
+        tile.setPosition(cx * 8, cy * 8);
+        tile.createCollider(new Rect(0, 0, 8, 8));
+        @:privateAccess tile.collider.debug = true;
       }
     }
   }

@@ -10,7 +10,7 @@ class Platform extends Entity {
     super();
 
     collider = addComponent(TileCollider);
-    collider.collisionMode = CollisionMode.TILEMAP;
+    collider.collisionMode = CollisionMode.STATIC;
     collider.tileType = TileType.HALF_BOTTOM;
   }
 

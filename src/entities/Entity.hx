@@ -5,11 +5,41 @@ import haxe.Constraints;
 import components.Component;
 
 class Entity {
+  /**
+    Pixel X coordinate in the world
+  **/
+  public var px(get, null): Int;
+  function get_px(): Int return Math.floor(x);
+  /**
+    Pixel Y coordinate in the world
+  **/
+  public var py(get, null): Int;
+  function get_py(): Int return Math.floor(y);
+  /**
+    Floating X coordinate in the world
+  **/
   public var x:Float;
+  /**
+    Floating Y coordinate in the world
+  **/
   public var y:Float;
 
-  private var components: Array<Component> = [for (i in 0...32) null];
   public var position(get, set): Vector2;
+  /**
+    Cell X coordinate in the world
+  **/
+  public var cx: Int;
+  function get_cx(): Int return px * Const.DEFAULT_TILE_SIZE;
+  /**
+    Cell Y coordinate in the world
+  **/
+  public var cy(get, null): Int;
+  function get_cy(): Int return py * Const.DEFAULT_TILE_SIZE;
+
+  /**
+    References to all child components
+  **/
+  private var components: Array<Component> = [for (i in 0...32) null];
   function get_position():Vector2 return new Vector2(x, y);
   function set_position(value: Vector2):Vector2 {
     x = value.x;

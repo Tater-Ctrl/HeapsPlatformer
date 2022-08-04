@@ -1,14 +1,15 @@
 {
 	"version": "0.2.0",
 	"configurations": [
+
         {
             "name": "HashLink",
-            "request": "launch",
             "type": "hl",
+            "request": "launch",
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": {
-                "type": "haxe",
-                "args": "active configuration"
+            "preLaunchTask": "release",
+            "windows": {
+                // Make windows compatible launch settings
             }
         }
 	]

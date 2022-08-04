@@ -1,6 +1,4 @@
 package entities;
-import h2d.Graphics;
-import types.Vector2;
 import utils.Time;
 import components.Camera;
 import types.Rect;
@@ -19,7 +17,8 @@ class Player extends Entity {
   private var collider: Collider;
   private var camera: Camera;
 
-  private var speed: Float = 4.;
+  private var speed: Float = 60;
+  private var jumpForce: Float = 100;
 
   public function new() {
     super();
@@ -33,7 +32,7 @@ class Player extends Entity {
     
     camera.mode = CameraMode.STATIC(0, 0);
 
-    body.gravityEnabled = true;
+    body.gravityEnabled = false;
     body.collisionEnabled = true;
     body.collider = collider;
     
@@ -41,19 +40,20 @@ class Player extends Entity {
     collider.collisionMode = CollisionMode.DYNAMIC;
     
     var tile = Res.img.traveler.toTile();
-    sprite.setSprite(tile.sub(0, 0, tile.width / 6, tile.height / 8));
+    sprite.setSprite(tile.sub(0, 0, tile.width / 6, tile.height / 8), 1);
+    sprite.moveMode = ESpriteMoveMode.Snap(1);
 
     input.Jump = jump;
   }
 
   override function fixedUpdate() {
     super.fixedUpdate();
-    body.movePosition(input.moveDirection * speed);
+    body.movePosition(input.moveDirection * speed * Time.fixedDeltaTime);
   }
 
   public function jump() {
     if (body.isGround) {
-      body.jump(7);
+      body.jump(jumpForce);
     }
   }
 }

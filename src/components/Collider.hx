@@ -8,7 +8,6 @@ import types.Vector2;
 enum CollisionMode {
   STATIC;
   DYNAMIC;
-  TILEMAP;
 }
 
 enum CollisionShape {
@@ -33,7 +32,7 @@ class Collider extends Component {
 
   override function awake() {
     super.awake();
-    if (collisionMode == CollisionMode.TILEMAP) {
+    if (collisionMode == CollisionMode.STATIC) {
       Level.addTilemapCollider(this);
     }
   }

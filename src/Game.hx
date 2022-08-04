@@ -1,22 +1,10 @@
+import hxd.System;
+import hxd.App;
 import hxd.Key;
 import entities.Level;
-import h2d.Graphics;
-import h2d.RenderContext;
 import utils.Time;
-import h2d.Layers;
-import utils.SpatialHash;
-import h2d.Camera;
-import h2d.Object;
 import hxd.Window;
-import utils.Quadtree;
-import types.Vector2;
-import types.Rect;
-import entities.Platform;
 import h2d.Scene;
-import components.Collider;
-import entities.Player;
-import utils.Debug;
-import entities.Entity;
 import hxd.Timer;
 import hxd.Res;
 
@@ -29,7 +17,8 @@ class Game extends hxd.App {
 
 	override function init() {
     inst = this;
-    Window.getInstance().resize(1280, 720);
+    Window.getInstance().resize(960, 540);
+    
     s2d.scaleMode = LetterBox(Const.RENDER_WIDTH, Const.RENDER_HEIGHT, false);
 
     new Level();
@@ -40,6 +29,10 @@ class Game extends hxd.App {
       Level.unload();
     if (Key.isPressed(Key.L))
       Level.load();
+    if (Key.isPressed(Key.ESCAPE))
+      System.exit();
+    if (Key.isPressed(Key.V))
+      Window.getInstance().vsync = !Window.getInstance().vsync;
   }
 
 	override function update(dt:Float) {

@@ -16,10 +16,10 @@ class Sprite extends h2d.Drawable {
   public inline function get_height() return bitmap.height;
   public inline function set_height(h: Float) return bitmap.height = h;
 
-  public function new(tile: Tile) {
+  public function new(tile: Tile, layer: Int = 0) {
     super(Game.getScene());
     bitmap = new Bitmap(tile, this);
-    Level.addLayer(this, 0);
+    Level.addLayer(this, layer);
   }
 
   public function setPos(x: Float, y: Float) {

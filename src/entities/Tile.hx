@@ -9,7 +9,7 @@ class Tile extends Entity {
 
   public function createCollider(bounds: Rect, tileType: TileType = TileType.SOLID) {
     collider = addComponent(TileCollider);
-    collider.collisionMode = CollisionMode.TILEMAP;
+    collider.collisionMode = CollisionMode.STATIC;
     collider.tileType = tileType;
     collider.setBounds(bounds);
   }

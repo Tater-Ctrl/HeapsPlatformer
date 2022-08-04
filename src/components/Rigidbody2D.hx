@@ -1,5 +1,7 @@
 package components;
 
+import utils.Time;
+import utils.Debug;
 import entities.Level;
 import hxd.Timer;
 import types.Rect;
@@ -8,7 +10,7 @@ import types.Vector2;
 class Rigidbody2D extends Component {
   public var collisionEnabled: Bool = true;
   public var gravityEnabled: Bool = true;
-  public var gravity: Float = 0.8;
+  public var gravity: Float = 100;
   public var isGround: Bool = false;
   public var isCeil: Bool = false;
   public var isWallRight: Bool = false;
@@ -34,18 +36,17 @@ class Rigidbody2D extends Component {
     super.start();
     targetPosition = entity.position;
   }
-
+  var flipped: Bool = false;
   private function interpolateBody() {
-    var mod = Timer.tmod / 2;
+    var pos = (targetPosition - startPosition);
 
-    entity.x += (targetPosition.x - startPosition.x) * mod;
-    entity.y += (targetPosition.y - startPosition.y) * mod;
+    entity.setPosition(entity.x + pos.x, entity.y + pos.y);
   }
 
   /**
     Currently dependent on gravity being enabled to function
   **/
-  public function jump(force: Int) {
+  public function jump(force: Float) {
     jumpForce = force;
   }
 
@@ -59,11 +60,11 @@ class Rigidbody2D extends Component {
     if (gravityEnabled)
       applyGravity();
 
-    actualVelocity += velocity + moveDirection;
+    actualVelocity += (velocity * Time.fixedDeltaTime) + moveDirection;
 
     if (collisionEnabled)
       checkCollision();
-
+    
     targetPosition.x += actualVelocity.x;
     targetPosition.y += actualVelocity.y;
 
@@ -134,7 +135,7 @@ class Rigidbody2D extends Component {
   }
 
   private function applyGravity() {
-    gravityAccum += gravity;
+    velocity.y += gravity * Time.fixedDeltaTime;
 
     if (isGround)
       velocity.y = 0.1;
@@ -145,14 +146,7 @@ class Rigidbody2D extends Component {
 
     if (jumpForce > 0) {
       velocity.y = -jumpForce;
-      
-      if (gravityAccum > 1)
-        jumpForce -= gravity;
-    }
-
-    if (gravityAccum > 1) {
-      gravityAccum = 0;
-      velocity.y += gravity;
+      jumpForce -= gravity * Time.fixedDeltaTime;
     }
   }
 }
